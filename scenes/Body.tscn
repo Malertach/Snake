@@ -1,0 +1,91 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/snake.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Area2D
+
+const TILE_SIZE = 16 # size of tile in pixels
+var direction = Vector2(0,0) # buffer for direction until it is time to move
+const CORNER_SPRITE_LEFT_DOWN = 1
+const CORNER_SPRITE_LEFT_UP = 4
+const CORNER_SPRITE_RIGHT_DOWN = 5
+const CORNER_SPRITE_RIGHT_UP = 6
+const CORNER_SPRITE_DICT = {
+	Vector2(1,1): CORNER_SPRITE_RIGHT_DOWN,
+	Vector2(1,-1): CORNER_SPRITE_RIGHT_UP,
+	Vector2(-1,1): CORNER_SPRITE_LEFT_DOWN,
+	Vector2(-1,-1): CORNER_SPRITE_LEFT_UP
+}
+const STRAIGHT_SPRITE = 2
+onready var sprite = $Sprite
+var next_segment = null
+
+
+func _ready():
+	position = position.snapped(Vector2.ONE * TILE_SIZE) # place sprite in tile
+	position += Vector2.ONE * TILE_SIZE/2 # center sprite in tile
+
+func move(new_direction):
+	var old_direction = direction
+	position += direction * TILE_SIZE 
+	direction = new_direction
+	orient_sprite()
+	if next_segment != null:
+		# next segment exists
+		next_segment.move(old_direction)
+
+func add_segment(new_segment):
+	if new_segment != null:
+		next_segment = new_segment
+		sprite.set_frame(STRAIGHT_SPRITE)
+
+
+func orient_sprite(is_moving := true):
+	# update sprite
+	if next_segment == null:
+		# this is the tail end
+		sprite.rotation = (direction.angle()+PI/2) # rotate sprite
+	else:
+		if (direction == get_dir_of_next_segment(is_moving)) \\
+		or (Vector2(0,0) == get_dir_of_next_segment(is_moving)):
+			if (name == \"@Body@3\") and (sprite.frame > 3):
+				pass
+			# next segment will be behind this one after next move
+			# segment moving in a straught line
+			sprite.set_frame(STRAIGHT_SPRITE)
+			sprite.rotation = (direction.angle()+PI/2) # rotate sprite
+			
+		else:
+			sprite.rotation = 0
+			# segments have a corner
+			# combine direction this sprite is movin in with from which diretion the next is comming from
+			var combined_dir = direction - get_dir_of_next_segment(is_moving)
+			sprite.set_frame(CORNER_SPRITE_DICT[combined_dir])
+
+# direction the next segment will move
+func get_dir_of_next_segment(is_moving := true):
+	var is_moving_factor = 1
+	if is_moving:
+		# next segment will advance
+		is_moving_factor = 1
+	else: 
+		# next segment will not advance. this may be a newly spawned segment
+		is_moving_factor = 0
+	return (-1) * position.direction_to(next_segment.position + next_segment.direction * TILE_SIZE * is_moving_factor)
+"
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 8, 8 )
+
+[node name="Body" type="Area2D"]
+script = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+vframes = 4
+hframes = 2
+frame = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )

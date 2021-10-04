@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/crunch.wav-07472bcd1d1c1f1c43fe35082eaf728b.sample"
+
+[deps]
+
+source_file="res://assets/crunch.wav"
+dest_files=[ "res://.import/crunch.wav-07472bcd1d1c1f1c43fe35082eaf728b.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

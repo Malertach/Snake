@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://scenes/Player.gd" type="Script" id=1]
+[ext_resource path="res://assets/snake.png" type="Texture" id=2]
+[ext_resource path="res://assets/Hi-Hat.wav" type="AudioStream" id=3]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8, 8 )
+
+[node name="Player" type="Area2D" groups=[
+"Player",
+]]
+script = ExtResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="." groups=[
+"Player",
+]]
+texture = ExtResource( 2 )
+vframes = 4
+hframes = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=[
+"Player",
+]]
+shape = SubResource( 1 )
+
+[node name="RayCast2D" type="RayCast2D" parent="." groups=[
+"Player",
+]]
+cast_to = Vector2( 0, -16 )
+collide_with_areas = true
+
+[node name="Timer_Move" type="Timer" parent="." groups=[
+"Player",
+]]
+wait_time = 0.5
+autostart = true
+
+[node name="TailSpawn" type="Position2D" parent="."]
+show_behind_parent = true
+position = Vector2( 0, 16 )
+__meta__ = {
+"_gizmo_extents_": 1.0
+}
+
+[node name="MoveRustling" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+volume_db = -12.0
+[connection signal="timeout" from="Timer_Move" to="." method="_on_Timer_timeout"]
